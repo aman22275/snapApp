@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Snap-app</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">loginActivity</string>
+    <string name="Username">username</string>
+    <string name="password_hint">Password</string>
+    <string name="Login">login_button</string>
+    <string name="login_button">Login</string>
+    <string name="sign_up_textview">Sign up</string>
+    <string name="title_activity_signup">signupActivity</string>
+    <string name="email_signup">Email</string>
+
+    <string name="signup_dialog_error_message">Please make sue you enter Username , password or email</string>
+<string name="signup_dialog_title">oopsss!!!</string>
+    <string name="menu_logout_label">Logout</string>
+</resources>
