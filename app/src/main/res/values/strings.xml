@@ -20,4 +20,6 @@
     <string name="signup_dialog_error_message">Please make sue you enter Username , password or email</string>
 <string name="signup_dialog_title">oopsss!!!</string>
     <string name="menu_logout_label">Logout</string>
+    <string name="empty_inbox_label">No new messages</string>
+    <string name="empty_friends_label">No friends </string>
 </resources>
