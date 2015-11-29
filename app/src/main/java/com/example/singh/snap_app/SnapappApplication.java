@@ -3,7 +3,6 @@ package com.example.singh.snap_app;
 import android.app.Application;
 
 import com.parse.Parse;
-import com.parse.ParseObject;
 
 
 public class SnapappApplication extends Application {
