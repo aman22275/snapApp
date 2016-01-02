@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 
@@ -38,9 +37,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        //ParseAnalytics.trackAppOpenedInBackground(getIntent());
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
         ParseUser current = new ParseUser();
 
@@ -115,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+        }
+        else
+        if(id == R.id.edit_friends)
+        {
+            Intent i =new Intent(this, EditFriends.class);
+            startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);

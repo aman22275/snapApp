@@ -16,10 +16,11 @@
     <string name="sign_up_textview">Sign up</string>
     <string name="title_activity_signup">signupActivity</string>
     <string name="email_signup">Email</string>
-
+<string name="menu_edit_friends">Edit Friends</string>
     <string name="signup_dialog_error_message">Please make sue you enter Username , password or email</string>
 <string name="signup_dialog_title">oopsss!!!</string>
     <string name="menu_logout_label">Logout</string>
     <string name="empty_inbox_label">No new messages</string>
     <string name="empty_friends_label">No friends </string>
+    <string name="title_activity_edit_friends">EditFriends</string>
 </resources>
