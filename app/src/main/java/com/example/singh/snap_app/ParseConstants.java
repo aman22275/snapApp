@@ -12,4 +12,7 @@ public final class ParseConstants {
 
     public final static String KEY_USER = "username";
 
+    //create a column in parse.com eg i added john,mack,mary
+    public final static String KEY_FRIENDS_RELATION = "FriendsRelation";
+
 }

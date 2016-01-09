@@ -2,102 +2,183 @@ package com.example.singh.snap_app;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
 public class EditFriends extends ListActivity {
 
-    public  static final String TAG = EditFriends.class.getSimpleName();
+    public static final String TAG = EditFriends.class.getSimpleName();
 
     protected List<ParseUser> mUsers;
+    protected ParseUser mCurrentUser = new ParseUser();
+    protected ParseRelation<ParseUser> mFriendsRelation ;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //it shows loading animation on actionbar
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_friends);
+        // Show the Up button in the action bar.
+
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+
 
     }
 
-    //listview of editfriends Activity
-    //Parsecontant is a class for all different fields like -> username,email...
     @Override
     protected void onResume() {
         super.onResume();
-        setProgressBarIndeterminateVisibility(true);
 
-        ParseQuery<ParseUser> query = new ParseUser().getQuery();
-        query.orderByAscending(ParseConstants.KEY_USER);
+        mCurrentUser = ParseUser.getCurrentUser();
+        mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+
+
+        //to list all users save in database
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.orderByAscending(ParseConstants.KEY_FRIENDS_RELATION);
         query.setLimit(1000);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> users, ParseException e) {
-                setProgressBarIndeterminateVisibility(true);
-                if(e == null)
-                {
-                    //success
+                setProgressBarIndeterminateVisibility(false);
+
+                if (e == null) {
+                    // Success
                     mUsers = users;
-                    String[] userNames = new String[mUsers.size()];
-                    int i=0;
-                    for(ParseUser user : mUsers)
-                    {
-                        userNames[i] = user.getUsername();
+                    String[] usernames = new String[mUsers.size()];
+                    int i = 0;
+                    for (ParseUser user : mUsers) {
+                        usernames[i] = user.getUsername();
                         i++;
                     }
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                             EditFriends.this,
                             android.R.layout.simple_list_item_checked,
-                            userNames);
+                            usernames);
                     setListAdapter(adapter);
-                }
-                else
-                {
+
+                    addFriendsCheckmark();
+                } else {
                     Log.e(TAG, e.getMessage());
-                    AlertDialog.Builder alert = new AlertDialog.Builder(EditFriends.this);
-                    alert.setMessage(e.getMessage());
-                    alert.setTitle(R.string.error_dialog);
-                    alert.setPositiveButton("OK", null);
-                    AlertDialog dialog = alert.create();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(EditFriends.this);
+                    builder.setMessage(e.getMessage())
+                            .setTitle("error")
+                            .setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.create();
                     dialog.show();
                 }
             }
         });
-
     }
+
+    //a seprate method called after adapter set,
+        private void addFriendsCheckmark()
+    {
+
+
+        mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> friends, ParseException e) {
+
+                if(e == null)
+                {
+                    //match
+                    int i=0;
+                    for(i=0 ; i< mUsers.size();i++ )
+                    {
+                        ParseUser user =  mUsers.get(i);
+
+                        for(ParseUser friend : friends)
+                        {
+                            if(friend.getObjectId().equals(user.getObjectId()))
+                            {
+                                getListView().setItemChecked(i, true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}.
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_edit_friends, menu);
+        getMenuInflater().inflate(R.menu.edit_friends, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // This ID represents the Home or Up button. In the case of this
+                // activity, the Up button is shown. Use NavUtils to allow users
+                // to navigate up one level in the application structure. For
+                // more details, see the Navigation pattern on Android Design:
+                //
+                // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+                //
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (getListView().isItemChecked(position)) {
+
+            mFriendsRelation.add(mUsers.get(position));
+            mCurrentUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            });
+        }
+        else {
+            // remove friend
+        }
+    }
 }
+
+
+
+
+
+
+
